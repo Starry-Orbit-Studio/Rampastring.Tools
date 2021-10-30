@@ -214,5 +214,27 @@ namespace Rampastring.Tools
                 }
             }
         }
+    
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void Debug(string msg)
+        {
+            try
+            {
+                DateTime now = DateTime.Now;
+
+                StringBuilder sb = new StringBuilder();
+                sb.Append(now.ToString("dd.MM. HH:mm:ss.fff"));
+                sb.Append("    ");
+                sb.Append(msg);
+
+                System.Diagnostics.Debug.WriteLine("[Logger - Debug]: " + sb.ToString());
+            }
+            catch
+            {
+            }
+        }
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void Debug(string msg, params object[] args)
+            => Debug(string.Format(msg, args));
     }
 }
