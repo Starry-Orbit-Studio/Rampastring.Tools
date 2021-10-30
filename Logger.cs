@@ -46,6 +46,8 @@ namespace Rampastring.Tools
                         sb.Append(data);
 
                         sw.WriteLine(sb.ToString());
+                        
+                        System.Diagnostics.Debug.WriteLine("[Logger]: " + sb.ToString());
 
                         sw.Close();
                     }
@@ -78,6 +80,8 @@ namespace Rampastring.Tools
 
                         sw.WriteLine(sb.ToString());
 
+                        System.Diagnostics.Debug.WriteLine("[Logger]: " + sb.ToString());
+
                         sw.Close();
                     }
                     catch
@@ -108,6 +112,8 @@ namespace Rampastring.Tools
                         sb.Append(string.Format(data, f1));
 
                         sw.WriteLine(sb.ToString());
+
+                        System.Diagnostics.Debug.WriteLine("[Logger]: " + sb.ToString());
 
                         sw.Close();
                     }
@@ -140,6 +146,8 @@ namespace Rampastring.Tools
 
                         sw.WriteLine(sb.ToString());
 
+                        System.Diagnostics.Debug.WriteLine("[Logger]: " + sb.ToString());
+
                         sw.Close();
                     }
                     catch
@@ -168,6 +176,8 @@ namespace Rampastring.Tools
 
                     sw.WriteLine(sb.ToString());
 
+                        System.Diagnostics.Debug.WriteLine("[Logger]: " + sb.ToString());
+
                     sw.Close();
                 }
                 catch
@@ -194,6 +204,8 @@ namespace Rampastring.Tools
                     sb.Append(data);
 
                     sw.WriteLine(sb.ToString());
+
+                        System.Diagnostics.Debug.WriteLine("[Logger]: " + sb.ToString());
 
                     sw.Close();
                 }
