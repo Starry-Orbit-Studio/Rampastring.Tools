@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.IO;
+using System.Diagnostics;
 
 namespace Rampastring.Tools
 {
@@ -17,12 +18,16 @@ namespace Rampastring.Tools
 
         private static string LogFileName;
 
+        private static string _logFullPath;
+
+
         private static readonly object locker = new object();
 
         public static void Initialize(string logFilePath, string logFileName)
         {
             LogPath = logFilePath;
             LogFileName = logFileName;
+            _logFullPath = Path.Combine(LogPath, LogFileName);
         }
 
         public static void Log(string data)
@@ -36,7 +41,7 @@ namespace Rampastring.Tools
                 {
                     try
                     {
-                        StreamWriter sw = new StreamWriter(LogPath + LogFileName, true);
+                        StreamWriter sw = new StreamWriter(_logFullPath, true);
 
                         DateTime now = DateTime.Now;
 
@@ -46,7 +51,7 @@ namespace Rampastring.Tools
                         sb.Append(data);
 
                         sw.WriteLine(sb.ToString());
-                        
+
                         System.Diagnostics.Debug.WriteLine("[Logger]: " + sb.ToString());
 
                         sw.Close();
@@ -102,7 +107,7 @@ namespace Rampastring.Tools
                 {
                     try
                     {
-                        StreamWriter sw = new StreamWriter(LogPath + LogFileName, true);
+                        StreamWriter sw = new StreamWriter(_logFullPath, true);
 
                         DateTime now = DateTime.Now;
 
@@ -135,7 +140,7 @@ namespace Rampastring.Tools
                 {
                     try
                     {
-                        StreamWriter sw = new StreamWriter(LogPath + LogFileName, true);
+                        StreamWriter sw = new StreamWriter(_logFullPath, true);
 
                         DateTime now = DateTime.Now;
 
@@ -165,7 +170,7 @@ namespace Rampastring.Tools
 
                 try
                 {
-                    StreamWriter sw = new StreamWriter(LogPath + LogFileName, true);
+                    StreamWriter sw = new StreamWriter(_logFullPath, true);
 
                     DateTime now = DateTime.Now;
 
@@ -176,7 +181,7 @@ namespace Rampastring.Tools
 
                     sw.WriteLine(sb.ToString());
 
-                        System.Diagnostics.Debug.WriteLine("[Logger]: " + sb.ToString());
+                    System.Diagnostics.Debug.WriteLine("[Logger]: " + sb.ToString());
 
                     sw.Close();
                 }
@@ -205,7 +210,7 @@ namespace Rampastring.Tools
 
                     sw.WriteLine(sb.ToString());
 
-                        System.Diagnostics.Debug.WriteLine("[Logger]: " + sb.ToString());
+                    System.Diagnostics.Debug.WriteLine("[Logger]: " + sb.ToString());
 
                     sw.Close();
                 }
@@ -214,20 +219,35 @@ namespace Rampastring.Tools
                 }
             }
         }
-    
-        [System.Diagnostics.Conditional("DEBUG")]
+
+        [Conditional("DEBUG")]
         public static void Debug(string msg)
         {
             try
             {
                 DateTime now = DateTime.Now;
+                var trace = new StackTrace();
+                int index = 0;
+                string type, name;
+                do
+                {
+                    index++;
+                    var frame = trace.GetFrame(1);
+                    var method = frame.GetMethod();
+                    type = method.DeclaringType.FullName;
+                    name = method.Name;
+                }
+                while (type == typeof(Logger).FullName);
 
                 StringBuilder sb = new StringBuilder();
                 sb.Append(now.ToString("dd.MM. HH:mm:ss.fff"));
                 sb.Append("    ");
+                sb.Append($"[{type}]::{name}(): ");
                 sb.Append(msg);
 
                 System.Diagnostics.Debug.WriteLine("[Logger - Debug]: " + sb.ToString());
+                using (StreamWriter sw = new StreamWriter(_logFullPath, true))
+                    sw.WriteLine("[Logger - Debug] " + sb.ToString());
             }
             catch
             {
