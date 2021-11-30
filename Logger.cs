@@ -20,6 +20,8 @@ namespace Rampastring.Tools
 
         private static string _logFullPath;
 
+        private static TextWriter _writer;
+
 
         private static readonly object locker = new object();
 
@@ -28,6 +30,7 @@ namespace Rampastring.Tools
             LogPath = logFilePath;
             LogFileName = logFileName;
             _logFullPath = Path.Combine(LogPath, LogFileName);
+            _writer = new StreamWriter(File.Open(_logFullPath, FileMode.Create, FileAccess.Write, FileShare.Read)) { AutoFlush = true };
         }
 
         public static void Log(string data)
@@ -41,20 +44,12 @@ namespace Rampastring.Tools
                 {
                     try
                     {
-                        StreamWriter sw = new StreamWriter(_logFullPath, true);
-
-                        DateTime now = DateTime.Now;
-
-                        StringBuilder sb = new StringBuilder();
-                        sb.Append(now.ToString("dd.MM. HH:mm:ss.fff"));
-                        sb.Append("    ");
+                        StringBuilder sb = new StringBuilder(GetPrefix());
                         sb.Append(data);
 
-                        sw.WriteLine(sb.ToString());
+                        _writer.WriteLine(sb.ToString());
 
                         System.Diagnostics.Debug.WriteLine("[Logger]: " + sb.ToString());
-
-                        sw.Close();
                     }
                     catch
                     {
@@ -74,20 +69,16 @@ namespace Rampastring.Tools
                 {
                     try
                     {
-                        StreamWriter sw = new StreamWriter(LogPath + fileName, true);
 
-                        DateTime now = DateTime.Now;
 
-                        StringBuilder sb = new StringBuilder();
-                        sb.Append(now.ToString("dd.MM. HH:mm:ss.fff"));
-                        sb.Append("    ");
+                        StringBuilder sb = new StringBuilder(GetPrefix());
                         sb.Append(data);
 
-                        sw.WriteLine(sb.ToString());
+                        _writer.WriteLine(sb.ToString());
 
                         System.Diagnostics.Debug.WriteLine("[Logger]: " + sb.ToString());
 
-                        sw.Close();
+
                     }
                     catch
                     {
@@ -107,20 +98,16 @@ namespace Rampastring.Tools
                 {
                     try
                     {
-                        StreamWriter sw = new StreamWriter(_logFullPath, true);
 
-                        DateTime now = DateTime.Now;
 
-                        StringBuilder sb = new StringBuilder();
-                        sb.Append(now.ToString("dd.MM. HH:mm:ss.fff"));
-                        sb.Append("    ");
+                        StringBuilder sb = new StringBuilder(GetPrefix());
                         sb.Append(string.Format(data, f1));
 
-                        sw.WriteLine(sb.ToString());
+                        _writer.WriteLine(sb.ToString());
 
                         System.Diagnostics.Debug.WriteLine("[Logger]: " + sb.ToString());
 
-                        sw.Close();
+
                     }
                     catch
                     {
@@ -140,20 +127,16 @@ namespace Rampastring.Tools
                 {
                     try
                     {
-                        StreamWriter sw = new StreamWriter(_logFullPath, true);
 
-                        DateTime now = DateTime.Now;
 
-                        StringBuilder sb = new StringBuilder();
-                        sb.Append(now.ToString("dd.MM. HH:mm:ss.fff"));
-                        sb.Append("    ");
+                        StringBuilder sb = new StringBuilder(GetPrefix());
                         sb.Append(string.Format(data, f1, f2));
 
-                        sw.WriteLine(sb.ToString());
+                        _writer.WriteLine(sb.ToString());
 
                         System.Diagnostics.Debug.WriteLine("[Logger]: " + sb.ToString());
 
-                        sw.Close();
+
                     }
                     catch
                     {
@@ -170,20 +153,16 @@ namespace Rampastring.Tools
 
                 try
                 {
-                    StreamWriter sw = new StreamWriter(_logFullPath, true);
 
-                    DateTime now = DateTime.Now;
 
-                    StringBuilder sb = new StringBuilder();
-                    sb.Append(now.ToString("dd.MM. HH:mm:ss.fff"));
-                    sb.Append("    ");
+                    StringBuilder sb = new StringBuilder(GetPrefix());
                     sb.Append(data);
 
-                    sw.WriteLine(sb.ToString());
+                    _writer.WriteLine(sb.ToString());
 
                     System.Diagnostics.Debug.WriteLine("[Logger]: " + sb.ToString());
 
-                    sw.Close();
+
                 }
                 catch
                 {
@@ -199,25 +178,38 @@ namespace Rampastring.Tools
 
                 try
                 {
-                    StreamWriter sw = new StreamWriter(LogPath + fileName, true);
 
-                    DateTime now = DateTime.Now;
-
-                    StringBuilder sb = new StringBuilder();
-                    sb.Append(now.ToString("dd.MM. HH:mm:ss.fff"));
-                    sb.Append("    ");
+                    StringBuilder sb = new StringBuilder(GetPrefix());
                     sb.Append(data);
 
-                    sw.WriteLine(sb.ToString());
+                    _writer.WriteLine(sb.ToString());
 
                     System.Diagnostics.Debug.WriteLine("[Logger]: " + sb.ToString());
 
-                    sw.Close();
+
                 }
                 catch
                 {
                 }
             }
+        }
+        private static string GetPrefix()
+        {
+            DateTime now = DateTime.Now;
+            var trace = new StackTrace();
+            int index = 0;
+            string type, name;
+            do
+            {
+                index++;
+                var frame = trace.GetFrame(index);
+                var method = frame.GetMethod();
+                type = method.DeclaringType.FullName;
+                name = method.Name;
+            }
+            while (type == typeof(Logger).FullName);
+
+            return $"{now:dd.MM. HH:mm:ss.fff}    [{type}]::{name}(): ";
         }
 
         [Conditional("DEBUG")]
@@ -225,36 +217,114 @@ namespace Rampastring.Tools
         {
             try
             {
-                DateTime now = DateTime.Now;
-                var trace = new StackTrace();
-                int index = 0;
-                string type, name;
-                do
-                {
-                    index++;
-                    var frame = trace.GetFrame(1);
-                    var method = frame.GetMethod();
-                    type = method.DeclaringType.FullName;
-                    name = method.Name;
-                }
-                while (type == typeof(Logger).FullName);
-
-                StringBuilder sb = new StringBuilder();
-                sb.Append(now.ToString("dd.MM. HH:mm:ss.fff"));
-                sb.Append("    ");
-                sb.Append($"[{type}]::{name}(): ");
+                StringBuilder sb = new StringBuilder(GetPrefix());
                 sb.Append(msg);
 
                 System.Diagnostics.Debug.WriteLine("[Logger - Debug]: " + sb.ToString());
-                using (StreamWriter sw = new StreamWriter(_logFullPath, true))
-                    sw.WriteLine("[Logger - Debug] " + sb.ToString());
+                lock (_writer)
+                    _writer.WriteLine("[Debug] " + sb.ToString());
             }
             catch
             {
             }
         }
-        [System.Diagnostics.Conditional("DEBUG")]
+        [Conditional("DEBUG")]
         public static void Debug(string msg, params object[] args)
             => Debug(string.Format(msg, args));
+
+        [Conditional("TRACE")]
+        public static void Trace(string msg)
+        {
+            try
+            {
+
+                StringBuilder sb = new StringBuilder(GetPrefix());
+                sb.Append(msg);
+
+                System.Diagnostics.Trace.WriteLine("[Logger - Trace]: " + sb.ToString());
+                lock (_writer)
+                    _writer.WriteLine("[Trace] " + sb.ToString());
+            }
+            catch
+            {
+            }
+        }
+
+        [Conditional("TRACE")]
+        public static void Trace(string msg, params object[] args)
+            => Trace(string.Format(msg, args));
+
+        public static void Info(string msg)
+        {
+            try
+            {
+
+                StringBuilder sb = new StringBuilder(GetPrefix());
+                sb.Append(msg);
+
+                System.Diagnostics.Trace.WriteLine("[Logger - Info]: " + sb.ToString());
+                lock (_writer)
+                    _writer.WriteLine("[Info] " + sb.ToString());
+            }
+            catch
+            {
+            }
+        }
+        public static void Info(string msg, params object[] args)
+            => Info(string.Format(msg, args));
+        public static void Warn(string msg)
+        {
+            try
+            {
+
+                StringBuilder sb = new StringBuilder(GetPrefix());
+                sb.Append(msg);
+
+                System.Diagnostics.Trace.WriteLine("[Logger - Warn]: " + sb.ToString());
+                lock (_writer)
+                    _writer.WriteLine("[Warn] " + sb.ToString());
+            }
+            catch
+            {
+            }
+        }
+        public static void Warn(string msg, params object[] args)
+            => Warn(string.Format(msg, args));
+        public static void Error(string msg)
+        {
+            try
+            {
+
+                StringBuilder sb = new StringBuilder(GetPrefix());
+                sb.Append(msg);
+
+                System.Diagnostics.Trace.WriteLine("[Logger - Error]: " + sb.ToString());
+                lock (_writer)
+                    _writer.WriteLine("[Error] " + sb.ToString());
+            }
+            catch
+            {
+            }
+        }
+        public static void Error(string msg, params object[] args)
+            => Error(string.Format(msg, args));
+        public static void Fatal(string msg)
+        {
+            try
+            {
+
+                StringBuilder sb = new StringBuilder(GetPrefix());
+                sb.Append(msg);
+
+                System.Diagnostics.Trace.WriteLine("[Logger - Fatal]: " + sb.ToString());
+                lock (_writer)
+                    _writer.WriteLine("[Fatal] " + sb.ToString());
+            }
+            catch
+            {
+            }
+        }
+        public static void Fatal(string msg, params object[] args)
+            => Fatal(string.Format(msg, args));
     }
 }
