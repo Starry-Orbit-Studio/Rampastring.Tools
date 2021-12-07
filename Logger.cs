@@ -196,6 +196,7 @@ namespace Rampastring.Tools
         private static string GetPrefix()
         {
             DateTime now = DateTime.Now;
+#if DEBUG
             var trace = new StackTrace();
             int index = 0;
             string type, name;
@@ -210,6 +211,9 @@ namespace Rampastring.Tools
             while (type == typeof(Logger).FullName);
 
             return $"{now:dd.MM. HH:mm:ss.fff}    [{type}]::{name}(): ";
+#else
+            return $"{now:dd.MM. HH:mm:ss.fff}    ";
+#endif
         }
 
         [Conditional("DEBUG")]
