@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if false
+using System;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -49,3 +50,4 @@ namespace Rampastring.Tools
         }
     }
 }
+#endif

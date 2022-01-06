@@ -1,26 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-      <TargetFrameworks>net40;net45</TargetFrameworks>
-      <Platforms>Windows;FNA</Platforms>
-      <UseWindowsForms Condition="'$(Platform)'=='Windows'">true</UseWindowsForms>
-      <Version>1.1.1</Version>
-      <OutputPath>bin/$(Configuration)/$(Platform)</OutputPath>
-      <Authors>Rampastring &amp; frg2089</Authors>
-      <Description>Rampastring's Generally Useful Library</Description>
-      <Copyright>Copyright © Rami '$(Authors)' Pasanen 2016-$([System.DateTime]::Now.Year)</Copyright>
-      <PackageReadmeFile>README.md</PackageReadmeFile>
-      <PackageProjectUrl>https://github.com/Starry-Orbit-Studio/Rampastring.Tools</PackageProjectUrl>
-      <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
-      <PackageLicenseExpression>MIT</PackageLicenseExpression>
-      <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-  
-      <DefineConstants Condition="'$(Platform)'=='FNA'">$(DefineConstants);FNA</DefineConstants>
-      <PackageVersion>$(Version)-$(Platform)</PackageVersion>
-    </PropertyGroup>
-  
-    <ItemGroup>
-      <None Include="..\..\README.md" Pack="true" PackagePath="" />
-    </ItemGroup>
-    
-  </Project>
+  <PropertyGroup>
+    <TargetFrameworks>net40</TargetFrameworks>
+    <Version>1.1.1</Version>
+    <!-- <OutputPath>bin/$(Configuration)/$(Platform)</OutputPath> -->
+    <Authors>Rampastring &amp; frg2089</Authors>
+    <Description>Rampastring's Generally Useful Library</Description>
+    <Copyright>Copyright © Rami '$(Authors)' Pasanen 2016-$([System.DateTime]::Now.Year)</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/Starry-Orbit-Studio/Rampastring.Tools</PackageProjectUrl>
+    <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+
+    <PackageVersion>$(Version)-$(Platform)</PackageVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+</Project>
