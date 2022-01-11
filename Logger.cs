@@ -30,6 +30,9 @@ namespace Rampastring.Tools
             LogPath = logFilePath;
             LogFileName = logFileName;
             _logFullPath = Path.Combine(LogPath, LogFileName);
+            var parent = Directory.GetParent(_logFullPath);
+            if (!parent.Exists)
+                parent.Create();
             _writer = new StreamWriter(File.Open(_logFullPath, FileMode.Create, FileAccess.Write, FileShare.Read)) { AutoFlush = true };
         }
 
